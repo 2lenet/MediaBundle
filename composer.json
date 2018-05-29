@@ -1,0 +1,23 @@
+{
+    "name": "2lenet/media-bundle",
+    "type": "symfony-bundle",
+    "description": "The 2LE's mediabundle.",
+    "keywords": ["lle", "mail"],
+    "homepage": "http://www.2le.net",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "2LE Team",
+            "homepage": "http://www.2le.net/",
+            "email": "support@2le.net"
+        }
+    ],
+    "require": {
+	      "php": ">=7.1"
+    },
+    "minimum-stability": "dev",
+    "target-dir": "Lle/MediaBundle",
+    "autoload": {
+        "psr-0": { "Lle\\MediaBundle": "" }
+    }
+}
