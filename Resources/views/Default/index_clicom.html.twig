@@ -1,0 +1,267 @@
+{% extends '::admin.html.twig' %}
+
+{% block title %}{% endblock %}
+
+{% block heading %}Administration Clicom{% endblock %}
+
+
+
+{% block body %}
+    <ol class="breadcrumb">
+        <li><a href="{{ path('Lle_media_homepage') }}"><i class="fa fa-folder-o"></i> Racine</a></li>
+        {% for key,name in folder.getVirtualPath %}
+            <li><a href="{{ path('Lle_media_homepage',{id:key}) }}"></i> {{ name }}</a></li>
+        {% endfor %}
+
+    </ol>
+
+    <div class="col-md-12">
+    <div class="nav nav-list">
+        <a class="btn btn-info" data-toggle="modal" onclick="openModal('new',{{ folder.id }},'','')"><i class="fa fa-folder-o"></i> Nouveau dossier</a>
+        {% if folder.id %}
+        <a class="btn btn-default" data-toggle="modal" href="#Modal_upload"><i class="fa fa-upload"></i> Upload fichiers</a>
+        {% endif %}
+        <a class="btn btn-default" onclick="window.location.href=window.location.href"><i class="fa fa-refresh"></i> Rafraîchir</a>
+    </div>
+<br>
+    </div>
+    <div class="col-md-12">
+        <div class="box box-solid box-info">
+            <div class="box-header">
+                <h3 class="box-title">{{ folder.name }}</h3>
+
+            </div>
+            <div class="box-body table-responsive no-padding">
+                <table class="table table-hover">
+                    <tbody>
+                    {# ACA : Dans admin clicom et si on est dans la racine, on affiche que les dossiers qui ont l'id != pd_documentation_racine #}
+                    {% if folder.id == 0 %}
+                        {% for f in folder.getChildren() %}
+                            {% if f.id != pd_documentation_racine%}
+                                <tr {% if not f.getEnabled() %}class="warning" {% endif %}>
+                                    <td><a  href="{{ path('Lle_media_homepage',{id:f.id}) }}"><i class="fa fa-2x fa-folder-o"></i> {{ f.name }} </a></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>
+                                        <nav class="nav nav-list">
+                                            <a class="btn btn-info" onclick="openModal('edit',{{ f.id }},'{{ f.name }}',{% if f.getEnabled() %}1{% else %}0{% endif %} )"><i class="fa fa-pencil-square-o"></i></a>
+
+                                            <form style="display: inline" method="post" action="{{ path('Lle_media_delete_folder',{id:f.id}) }}">
+
+                                                <button type="submit" class="btn btn-danger"><i class="fa fa-trash-o"></i></button>
+                                            </form>
+                                        </nav>
+
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        {% for f in folder.getChildren() %}
+                            <tr {% if not f.getEnabled() %}class="warning" {% endif %}>
+                                <td><a  href="{{ path('Lle_media_homepage',{id:f.id}) }}"><i class="fa fa-2x fa-folder-o"></i> {{ f.name }} </a></td>
+                                <td></td>
+                                <td></td>
+                                <td>
+                                    <nav class="nav nav-list">
+                                        <a class="btn btn-info" onclick="openModal('edit',{{ f.id }},'{{ f.name }}',{% if f.getEnabled() %}1{% else %}0{% endif %} )"><i class="fa fa-pencil-square-o"></i></a>
+
+                                        <form style="display: inline" method="post" action="{{ path('Lle_media_delete_folder',{id:f.id}) }}">
+
+                                            <button type="submit" class="btn btn-danger"><i class="fa fa-trash-o"></i></button>
+                                        </form>
+                                    </nav>
+
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
+
+                    {% for f in folder.getFiles() %}
+                        <tr {% if not f.getFileExist() %}class="danger" {% endif %}>
+                            <td><a  href="{{ path('Lle_media_edit_file',{id:f.id}) }}"><i class="fa fa-2x fa-file-o"></i> {{ f.filename }}.{{ f.mimetype }} </a></td>
+                            <td></td>
+                            <td></td>
+                            <td>
+                                <nav class="nav nav-list">
+                                    <a class="btn btn-info" href="{{ path('Lle_media_download_file',{id:f.id}) }}"><i class="fa fa-download"></i></a>
+
+                                    <form style="display: inline" method="post" action="{{ path('Lle_media_delete_file',{id:f.id}) }}">
+
+                                        <button type="submit" class="btn btn-danger"><i class="fa fa-trash-o"></i></button>
+                                    </form>
+                                </nav>
+
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="Modal_folder" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="Modal_folder_title"></h4>
+                </div>
+                <div class="modal-body">
+                    <div class="col-md-12" id="Modal_folder_errors" style="display: none">
+
+                    </div>
+                    <div class="form-group">
+                        <label for="Modal_folder_txt">Nom du dossier</label>
+                        <input class="form-control" type="text" id="Modal_folder_txt">
+                    </div>
+                    <div class="form-group">
+                        <input class="form-control" type="checkbox" id="Modal_folder_active">
+                        <label for="Modal_folder_active">Active?</label>
+                    </div>
+                    <input type="hidden" id="Modal_folder_action_type">
+                    <input type="hidden" id="Modal_folder_action_id">
+                </div>
+                <div class="modal-footer">
+                    <a class="btn btn-info" id="Modal_folder_action_btn" onclick="javascript:actionFolder()" data-loading-text="Loading...">Valider</a>
+                    <a class="btn btn-danger" data-dismiss="modal">Retour</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <link href="{{ asset('js/plugins/Dropzone/css/dropzone.css') }}" rel="stylesheet" type="text/css" />
+
+    <div class="modal fade" id="Modal_upload" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id=""> Upload fichiers</h4>
+                </div>
+                <div class="modal-body" style="min-height: 400px;">
+                    <div class="col-md-12" id="Modal_upload_errors">
+
+                    </div>
+                    <div class="col-md-12" id="Modal_folder_errors">
+
+                        <form action="{{ path('Lle_media_file_upload',{id:folder.id}) }}" id="dropZone" class="dropzone">
+                            <div class="fallback">
+                                <input name="file" type="file" multiple />
+                            </div>
+                        </form>
+
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <a class="btn btn-danger" data-dismiss="modal">Retour</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+{% block javascripts %}
+    <script src="{{ asset('js/plugins/Dropzone/dropzone.min.js')}}" type="text/javascript"></script>
+    {{ parent() }}
+    <script>
+        function openModal(type,id,name,status){
+            if(type=='edit'){
+                $('#Modal_folder_action_type').val('edit');
+                $('#Modal_folder_title').html('Modifier Dossier');
+                $('#Modal_folder_txt').val(name);
+                $('#Modal_folder_action_id').val(id);
+                if(status==1){
+                    $('#Modal_folder_active').prop('checked', true);
+                    $('#Modal_folder_active').parent().addClass('checked');
+                }else{
+                    $('#Modal_folder_active').prop('checked', false);
+                    $('#Modal_folder_active').parent().removeClass('checked');
+                }
+            }else{
+                $('#Modal_folder_action_type').val('new');
+                $('#Modal_folder_title').html('Nouveau Dossier');
+                $('#Modal_folder_txt').val('');
+                $('#Modal_folder_action_id').val(id);
+                $('#Modal_folder_active').prop('checked', false);
+                $('#Modal_folder_active').parent().removeClass('checked');
+
+            }
+            $("#Modal_folder_errors").html('');
+            $("#Modal_folder_errors").hide();
+            $('#Modal_folder').modal();
+        }
+        function actionFolder(){
+            if($('#Modal_folder_txt').val()){
+                $('#text_add_folder').attr('disabled','disabled');
+                $('#Modal_folder_active').attr('disabled','disabled');
+                $('#Modal_folder_action_btn').button('loading');
+
+                $.ajax({
+                    url : "{{ path('Lle_media_folder_action') }}",
+                    type: "POST",
+                    data: {
+                        type:$('#Modal_folder_action_type').val(),
+                        id:$('#Modal_folder_action_id').val(),
+                        name : $('#Modal_folder_txt').val(),
+                        status: $('#Modal_folder_active').is(':checked')
+                    },
+                    success: function(data, textStatus, jqXHR)
+                    {
+                        r = jQuery.parseJSON(data);
+                        if(r.status){
+                            window.location.href=window.location.href;
+                        }else{
+                            erreur_html= '<div class="alert alert-dismissible alert-danger" ><i class="fa fa-exclamation-triangle"></i>&nbsp'+ r.msg+'</div>';
+                            $("#Modal_folder_errors").html(erreur_html);
+                            $("#Modal_folder_errors").show();
+
+                            $('#Modal_folder_action_btn').button('reset');
+                            $('#Modal_folder_txt').removeAttribute('disabled');
+                            $('#Modal_folder_active').removeAttribute('disabled');
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown)
+                    {
+                        $('#Modal_folder_action_btn').button('reset');
+                        $('#Modal_folder_txt').removeAttribute('disabled');
+                        $('#Modal_folder_active').removeAttribute('disabled');
+                    }
+                });
+            }else{
+                erreur_html= '<div class="alert alert-dismissible alert-danger" ><i class="fa fa-exclamation-triangle"></i>&nbsp Nom du dossier obligatoire.</div>';
+                $("#Modal_folder_errors").html(erreur_html);
+                $("#Modal_folder_errors").show();
+            }
+        }
+        var file_uploaded = false;
+        Dropzone.options.dropZone = {
+            init: function() {
+                this.on("success", function(file,response) {
+                    r = jQuery.parseJSON(response);
+                    if(r.status){
+                        file_uploaded = true;
+                    }
+                    else{
+                        file.previewElement.classList.add("dz-error");
+                        erreur_html= '<div class="alert alert-dismissible alert-danger" ><i class="fa fa-exclamation-triangle"></i>&nbsp'+ r.msg+'</div>';
+                        $("#Modal_upload_errors").append(erreur_html);
+                        $("#Modal_upload_errors").show();
+                    }
+
+                });
+            }
+        };
+        $('#Modal_upload').on('hidden.bs.modal', function () {
+            if(file_uploaded){
+                window.location.href=window.location.href
+            }
+        })
+    </script>
+
+{% endblock %}

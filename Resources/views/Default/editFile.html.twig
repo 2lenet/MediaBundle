@@ -1,0 +1,74 @@
+{% extends '::admin.html.twig' %}
+
+{% block heading %}
+File
+{% endblock %}
+
+
+
+{% block body %}
+
+    <ol class="breadcrumb">
+        <li><a href="{{ path('Lle_media_homepage') }}"><i class="fa fa-folder-o"></i> Racine</a></li>
+        {% for key,name in entity.folder.getVirtualPath %}
+            <li><a href="{{ path('Lle_media_homepage',{id:key}) }}"></i> {{ name }}</a></li>
+        {% endfor %}
+        <li class="active"> {{ entity.filename }}.{{ entity.mimetype }}</li>
+    </ol>
+
+    <div class="row">
+        <div class="col-xs-9">
+            <div class="box  box-success">
+                <div class="box-header">
+
+                </div>
+                <div class="box-body">
+                    <form action="{{ path('Lle_media_update_file', { 'id': entity.id }) }}" class="form-group" method="post" {{ form_enctype(edit_form) }}>
+                        <input type="hidden" name="_method" value="PUT" />
+                        {#{{ form_widget(edit_form) }}#}
+
+                        <div class="form-group">
+                            {{ form_label( edit_form, 'Nom de fichier') }}
+                            {{ form_widget( edit_form.filename , {'attr': {'class': 'form-control'}}) }}
+                        </div>
+
+                        <div class="form-group">
+                            {{ form_label( edit_form, 'Description') }}
+                            {{ form_widget( edit_form.description , {'attr': {'class': 'form-control'}}) }}
+                        </div>
+
+                        {#{{ form_label( edit_form, 'Enabled', {'label_attr': {'class': 'form-control'}}) }}#}
+                        {#{{ form_widget( edit_form.enabled , {'attr': {'class': 'form-group'}}) }}#}
+
+                        <div class="form-group">
+                            {{ form_label( edit_form, 'Master') }}
+                            {{ form_widget( edit_form.master , {'attr': {'class': 'form-control'}}) }}
+                        </div>
+
+                        <div class="form-group">
+                            {{ form_label( edit_form, 'Type') }}
+                            {{ form_widget( edit_form.type , {'attr': {'class': 'form-control'}}) }}
+                        </div>
+
+                        <p>
+                            {{ form_rest(edit_form) }}
+                            <button type="submit" class="btn btn-success">{{ 'views.edit.editbutton'|trans({}, 'JordiLlonchCrudGeneratorBundle') }}</button>
+                        </p>
+                    </form>
+                </div>
+                <div class="box-footer">
+
+                    <a class="btn btn-info" href="{{ path('Lle_media_download_file',{id:entity.id}) }}"><i class="fa fa-download"></i> Download</a>
+
+                    <form style="display: inline" method="post" action="{{ path('Lle_media_delete_file',{id:entity.id}) }}">
+
+                        <button type="submit" class="btn btn-danger"><i class="fa fa-trash-o"></i> Delete</button>
+                    </form>
+
+                </div>
+            </div>
+         </div>
+    </div>
+
+
+{% endblock %}
