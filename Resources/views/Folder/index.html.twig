@@ -1,0 +1,93 @@
+{% extends '@EasyAdmin/default/layout.html.twig' %}
+
+{% block heading %}Media{% endblock %}
+
+{% block content %}
+    <h2>Gestion des médias</h2>
+    <div class="col-md-12">
+        <div class="box box-solid box-info">
+            <div class="box-header">
+                <h3 class="box-title">
+                    {% for parent in folder.parents %}
+                        <a href="{{ path('lle_media_index',{id:parent.id}) }}"> {{ parent.name }}</a> / 
+                    {% endfor %}
+                    {{ folder.name }}
+                </h3>
+            </div>
+            <div class="box-body table-responsive no-padding">
+                <table class="table table-hover">
+                    <tbody>
+                    {% for f in folder.getChildren() %}
+                    <tr>
+                       <td><a  href="{{ path('lle_media_folder',{id:f.id}) }}"><i class="fa fa-2x fa-folder-o"></i> {{ f.name }} </a></td>
+                        <td></td>
+                        <td></td>
+                        <td>
+                            <nav class="nav nav-list">
+                                <a class="btn btn-info"><i class="fa fa-pencil-square-o"></i></a>
+                                <form style="display: inline" method="post" action="{{ path('lle_media_delete_folder',{id:f.id}) }}">
+                                    <button type="submit" class="btn btn-danger"><i class="fa fa-trash-o"></i></button>
+                                </form>
+                            </nav>
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                    {% for f in folder.getFiles() %}
+                        <tr>
+                            <td><a  href="{{ path('lle_media_edit_file',{id:f.id}) }}"><i class="fa fa-2x fa-file-o"></i> {{ f.filename }} </a></td>
+                            <td></td>
+                            <td></td>
+                            <td>
+                                <nav class="nav nav-list">
+                                    <a class="btn btn-info" href="{{ path('lle_media_download_file',{id:f.id}) }}"><i class="fa fa-download"></i></a>
+
+                                    <form style="display: inline" method="post" action="{{ path('lle_media_delete_file',{id:f.id}) }}">
+
+                                        <button type="submit" class="btn btn-danger"><i class="fa fa-trash-o"></i></button>
+                                    </form>
+                                </nav>
+
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="box-footer">
+                <form style="display: inline" method="post" action="{{ path('lle_media_new_folder',{id:folder.id}) }}">
+                    <input type="text" name="folder_name" placeholder="create new folder here">
+                    <button type="submit" class="btn btn-sm"><i class="fa fa-check-o"></i>Ok</button>
+                </form>
+
+                <div class="dropzone upload-dropzone" id="file_upload" action="{{path('lle_media_file_upload',{id:folder.id})}}">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block head_javascript %}
+    {{  parent() }}
+    <script src="{{ asset('bundles/llemedia/js/dropzone.js') }}"></script>
+
+{% endblock %}
+
+{% block head_stylesheets %}
+    {{  parent() }}
+    <link rel="stylesheet" href="{{ asset('bundles/llemedia/css/dropzone.css') }}">
+{% endblock %}
+
+{% block body_javascript %}
+    {{ parent() }}
+    <script>
+        //je récupère l'action où sera traité l'upload en PHP
+        var _actionToDropZone = $("#file_upload").attr('action');
+
+        //je définis ma zone de drop grâce à l'ID de ma div citée plus haut.
+        Dropzone.autoDiscover = false;
+        var myDropzone = new Dropzone("#file_upload", { url: _actionToDropZone });
+    </script>
+{% endblock %}
