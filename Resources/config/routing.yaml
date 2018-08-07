@@ -1,0 +1,54 @@
+
+lle_media_index:
+    path:     /
+    defaults: 
+        _controller: LleMediaBundle:Folder:index
+
+lle_media_new_folder:
+    path:     /{id<\d+>}/new
+    defaults: 
+        _controller: LleMediaBundle:Folder:newFolder
+
+lle_media_folder:
+    path:     /{id<\d+>}
+    defaults: 
+        _controller: LleMediaBundle:Folder:folderIndex
+
+
+
+lle_media_file_upload:
+    path:     /file/upload/{id}
+    defaults: 
+        _controller: LleMediaBundle:Folder:fileUpload 
+    requirements:
+        _method:  POST
+
+lle_media_delete_folder:
+    path:     /deleteFolder/{id}
+    defaults: 
+        _controller: LleMediaBundle:Folder:deleteFolder
+    requirements:
+        _method:  POST
+
+
+lle_media_delete_file:
+    path:     /deleteFile/{id}
+    defaults: 
+        _controller: LleMediaBundle:Folder:deleteFile
+    requirements:
+        _method:  POST
+
+lle_media_download_file:
+    path:     /downloadFile/{id}
+    defaults: 
+        _controller: LleMediaBundle:Folder:downloadFile
+
+lle_media_edit_file:
+    path:     /editFile/{id}
+    defaults: 
+        _controller: LleMediaBundle:Folder:editFile
+
+lle_media_update_file:
+    path:     /updateFile/{id}
+    defaults: 
+        _controller: LleMediaBundle:Folder:updateFile
