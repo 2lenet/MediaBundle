@@ -6,6 +6,7 @@
 
 namespace Lle\MediaBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
@@ -80,10 +81,14 @@ class Folder {
     private $slug;
 
      /**
-     * @ORM\OneToMany(targetEntity="File", mappedBy="folder",cascade={"remove"})
+     * @ORM\OneToMany(targetEntity="File", orphanRemoval=true, mappedBy="folder",cascade={"remove"})
      * @ORM\OrderBy({"filename" = "ASC"})
      */
     private $files;
+
+    public function __construct(){
+        $this->files = new ArrayCollection();
+    }
 
     public function getId()
     {
@@ -147,6 +152,15 @@ class Folder {
 
     public function setFiles($files) {
         $this->files = $files;
+    }
+
+    public function addFile(File $file){
+        $file->setFolder($this);
+        $this->files->add($file);
+    }
+    public function removeFile(File $file)
+    {
+        $this->files->removeElement($file);
     }
 
 

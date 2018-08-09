@@ -9,3 +9,6 @@ services:
     Lle\MediaBundle\Service\:
         resource: '../../Service'
 
+    Lle\MediaBundle\Command\ReaderMediaCommand:
+        arguments: ["@doctrine.orm.entity_manager"]
+

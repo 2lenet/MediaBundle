@@ -13,7 +13,8 @@
         }
     ],
     "require": {
-	      "php": ">=7.1"
+        "php": ">=7.1",
+        "symfony/finder": "^4.0"
     },
     "minimum-stability": "dev",
     "target-dir": "Lle/MediaBundle",
