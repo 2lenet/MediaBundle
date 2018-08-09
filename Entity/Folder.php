@@ -9,12 +9,11 @@ namespace Lle\MediaBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
-
+use Gedmo\Sluggable\Util\Urlizer;
 /**
  *
  * @Gedmo\Tree(type="nested")* 
- * @ORM\Table(name="lle_media_folder")
- * @ORM\Entity()
+ * @ORM\Table(name="lle_media_folder",indexes={@ORM\Index(name="folder_path_index", columns={"path"})})
  * @ORM\Entity(repositoryClass="Gedmo\Tree\Entity\Repository\NestedTreeRepository")
  * 
  */
@@ -75,10 +74,14 @@ class Folder {
     private $children;
 
     /**
-     * @Gedmo\Slug(fields={"name", "id"})
-     * @ORM\Column(length=1024, nullable=true)
+     * @ORM\Column(length=1024, type="string", nullable=true)
      */
     private $slug;
+
+    /**
+     * @ORM\Column(length=512, type="string", nullable=true)
+     */
+    private $path;
 
      /**
      * @ORM\OneToMany(targetEntity="File", orphanRemoval=true, mappedBy="folder",cascade={"remove"})
@@ -164,5 +167,25 @@ class Folder {
     }
 
 
+    public function getPath() {
+        if (!$this->path) {
+            $this->updatePath();
+        }
+        return $this->path;
+    }
+
+    public function setPath($path){
+        $this->path = $path;
+    }
+
+    public function updatePath() {
+        $path = "/";
+        $urlizer = new Urlizer();
+        foreach($this->getParents() as $parent) {
+            $path .= $urlizer->urlize($parent->getName()).'/';
+        }
+        $path .= $urlizer->urlize($this->getName()).'/';
+        $this->path = $path;
+    }
 
 }

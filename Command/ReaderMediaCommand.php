@@ -18,6 +18,7 @@ class ReaderMediaCommand extends Command
     private $em;
     private $directories;
     private $files;
+    private $counter;
 
     public function __construct(EntityManagerInterface $em)
     {
@@ -26,6 +27,7 @@ class ReaderMediaCommand extends Command
         $this->em = $em;
         $this->directories = [];
         $this->files = [];
+        $this->counter = ['file'=>0,'folder'=>0];
     }
 
     protected function configure()
@@ -40,12 +42,15 @@ class ReaderMediaCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->finder->in('media');
-        $this->directories = $this->em->getRepository(Folder::class)->createQueryBuilder('f','f.name')->getQuery()->getResult();
+        $this->directories = $this->em->getRepository(Folder::class)->createQueryBuilder('f','f.path')->getQuery()->getResult();
         $this->files = $this->em->getRepository(File::class)->createQueryBuilder('f','f.path')->getQuery()->getResult();
         $this->readDirectories($output);
         $this->readFiles($output);
 
+        $output->writeln('Wait');
         $this->em->flush();
+        $output->writeln('<fg=green>New Folder: ' . $this->counter['folder'] .'</>');
+        $output->writeln('<fg=green>New File: ' . $this->counter['file'] .' </>');
     }
 
     public function readDirectories(OutputInterface $output){
@@ -54,7 +59,8 @@ class ReaderMediaCommand extends Command
             $output->writeln($directory);
             /* @var SplFileInfo $directory */
             $ormDirectory = new Folder();
-            $ormDirectory->setName((string)$directory);
+            $ormDirectory->setName($directory->getFilename());
+            $ormDirectory->setPath((string)$directory);
 
             //In class SplFileInfo the path return the parent directory
             if(array_key_exists($directory->getPath(), $this->directories)){
@@ -64,6 +70,7 @@ class ReaderMediaCommand extends Command
             }
             if(!array_key_exists((string)$directory, $this->directories)) {
                 $this->em->persist($ormDirectory);
+                $this->counter['folder']++;
                 $this->medias[(string)$directory] = $ormDirectory;
             }
         }
@@ -86,6 +93,7 @@ class ReaderMediaCommand extends Command
             }
             if(!array_key_exists((string)$file, $this->files)) {
                 $this->em->persist($ormFile);
+                $this->counter['file']++;
                 $this->medias[(string)$file] = $ormFile;
             }
         }

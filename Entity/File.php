@@ -11,7 +11,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  *
- * @ORM\Table(name="lle_media_file")
+ * @ORM\Table(name="lle_media_file",indexes={@ORM\Index(name="file_path_index", columns={"path"})})
  * @ORM\Entity
  */
 class File {
@@ -41,7 +41,7 @@ class File {
     private $folder;
 
     /**
-     * @ORM\Column(name="path", type="string")
+     * @ORM\Column(name="path", type="string", length=512)
      */
     private $path;
 
@@ -143,9 +143,9 @@ class File {
         return $this->description;
     }
 
-    protected function getUploadRootDir()
+    protected function getUploadRootDir($root)
     {
-        return '/media';
+        return $root.$this->folder->getPath().'/';
     }
 
     function getStoreFilename($filename)
@@ -153,7 +153,7 @@ class File {
         return $filename;
     }
 
-    public function upload($media)
+    public function upload($media, $root)
     {
         if ($media->isValid()) {
             $filename = $media->getClientOriginalName();
@@ -163,14 +163,16 @@ class File {
             $this->setSize($media->getSize());
             $this->setMimeType($media->getMimetype());
 
-            if (!file_exists($this->getUploadRootDir())) {
-                mkdir($this->getUploadRootDir(), 0775, true);
+            $upload_dir = $this->getUploadRootDir($root);
+
+            if (!file_exists($upload_dir)) {
+                mkdir($upload_dir, 0775, true);
             }
             $media->move(
-                $this->getUploadRootDir(), $storename
+                $upload_dir, $storename
             );
 
-            $this->setPath($storename);
+            $this->setPath($this->folder->getPath().$storename);
         }
     }
 

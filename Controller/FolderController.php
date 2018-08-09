@@ -12,16 +12,20 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpFoundation\File\MimeType\FileinfoMimeTypeGuesser;
 
 class FolderController extends Controller
 {
     public function indexAction()
     {
         $em = $this->getDoctrine()->getManager();
-        $root = $em->getRepository('LleMediaBundle:Folder')->findOneBy(['slug'=>'/']);
+        $root = $em->getRepository('LleMediaBundle:Folder')->findOneBy(['parent'=>null]);
         if (!$root) {
             $root = new Folder();
-            $root->setTitle('Media');
+            $root->setName('Media');
+            $root->updatePath();
             $em->persist($root);
             $em->flush();
         }
@@ -48,6 +52,7 @@ class FolderController extends Controller
         $folder = new Folder();
         $folder->setName($request->get('folder_name'));
         $folder->setParent($parent);
+        $folder->updatePath();
         $em->persist($folder);
         $em->flush();
         return $this->redirectToRoute('lle_media_folder', ['id' => $folder->getId()] );
@@ -84,37 +89,44 @@ class FolderController extends Controller
 
     public function fileUploadAction(Request $request, Folder $folder){
         $em = $this->getDoctrine()->getManager();
+        $root = $this->getParameter('kernel.root_dir')."/../media/";
 
         $media = $request->files->get('file');
+       
         $file = new File();
         $file->setFolder($folder);
-        $file->upload($media);
+        $file->upload($media, $root);
+
         $em->persist($file);
         $em->flush();
         return new JsonResponse(array('success' => true));
     }
 
-    public function downloadFileAction($id){
+    public function downloadFileAction(File $file) {
+        $root = $this->getParameter('kernel.root_dir')."/../media/";
 
-        if($id){
-            $em = $this->getDoctrine()->getManager();
-            $file = $em->getRepository('LleMediaBundle:File')->find($id);
-            if($file){
-                $response = new Response();
+        // This should return the file to the browser as response
+        $response = new BinaryFileResponse($root.$file->getPath());
 
-                $response->headers->set('Cache-Control', 'private');
-                $response->headers->set('Content-type', mime_content_type($file->getPath()));
-                $response->headers->set('Content-Disposition', 'attachment; filename="' . $file->getFilename() . '";');
-                $response->headers->set('Content-length', filesize($file->getPath()));
+        // To generate a file download, you need the mimetype of the file
+        $mimeTypeGuesser = new FileinfoMimeTypeGuesser();
 
-                $response->sendHeaders();
-
-                $response->setContent(readfile($file->getPath()));
-            }
+        // Set the mimetype with the guesser or manually
+        if($mimeTypeGuesser->isSupported()){
+            // Guess the mimetype of the file according to the extension of the file
+            $response->headers->set('Content-Type', $mimeTypeGuesser->guess($root.$file->getPath()));
+        } else {
+            // Set the mimetype of the file manually, in this case for a text file is text/plain
+            $response->headers->set('Content-Type', 'text/plain');
         }
 
-        return $this->redirect($this->generateUrl('lle_media_index'));
+        // Set content disposition inline of the file
+        $response->setContentDisposition(
+            ResponseHeaderBag::DISPOSITION_INLINE,
+            $file->getFilename()
+        );
 
+        return $response;
     }
 
     /**
