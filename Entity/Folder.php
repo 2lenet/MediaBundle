@@ -8,7 +8,7 @@ namespace Lle\MediaBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
-
+use Gedmo\Sluggable\Util\Urlizer;
 /**
  *
  * @Gedmo\Tree(type="nested")* 
@@ -74,10 +74,14 @@ class Folder {
     private $children;
 
     /**
-     * @Gedmo\Slug(fields={"name", "id"})
      * @ORM\Column(length=1024, nullable=true)
      */
     private $slug;
+
+    /**
+     * @ORM\Column(length=1024, nullable=true)
+     */
+    private $path;
 
      /**
      * @ORM\OneToMany(targetEntity="File", mappedBy="folder",cascade={"remove"})
@@ -149,6 +153,19 @@ class Folder {
         $this->files = $files;
     }
 
-
-
+    public function getPath() {
+        if (!$this->path) {
+            $this->updatePath();
+        }
+        return $this->path;
+    }
+    public function updatePath() {
+        $path = "/";
+        $urlizer = new Urlizer();
+        foreach($this->getParents() as $parent) {
+            $path .= $urlizer->urlize($parent->getName()).'/';
+        }
+        $path .= $urlizer->urlize($this->getName()).'/';
+        $this->path = $path;
+    }
 }
