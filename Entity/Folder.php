@@ -83,6 +83,11 @@ class Folder {
      */
     private $path;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=false,  options={"default" : 0})
+     */
+    private $public = false;
+
      /**
      * @ORM\OneToMany(targetEntity="File", orphanRemoval=true, mappedBy="folder",cascade={"remove"})
      * @ORM\OrderBy({"filename" = "ASC"})
@@ -187,5 +192,29 @@ class Folder {
         $path .= $urlizer->urlize($this->getName()).'/';
         $this->path = $path;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getPublic()
+    {
+        return $this->public;
+    }
+
+    /**
+     * @param mixed $public
+     */
+    public function setPublic($public)
+    {
+        $this->public = $public;
+    }
+
+    public function getPublicPath(){
+        return 'media/'.$this->getPath();
+    }
+
+
+
+
 
 }
