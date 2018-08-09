@@ -10,6 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+use Lle\MediaBundle\Lib\MimeReader;
 
 class ReaderMediaCommand extends Command
 {
@@ -59,19 +60,20 @@ class ReaderMediaCommand extends Command
             $output->writeln($directory);
             /* @var SplFileInfo $directory */
             $ormDirectory = new Folder();
+            $fullPath = str_replace('media/','',(string)$directory);
             $ormDirectory->setName($directory->getFilename());
-            $ormDirectory->setPath((string)$directory);
+            $ormDirectory->setPath($fullPath);
 
             //In class SplFileInfo the path return the parent directory
             if(array_key_exists($directory->getPath(), $this->directories)){
                 /* @var Folder $folder */
-                $folder = $this->directories[$directory->getPath()];
+                $folder = $this->directories[$fullPath];
                 $ormDirectory->setParent($folder);
             }
-            if(!array_key_exists((string)$directory, $this->directories)) {
+            if(!array_key_exists($fullPath, $this->directories)) {
                 $this->em->persist($ormDirectory);
                 $this->counter['folder']++;
-                $this->medias[(string)$directory] = $ormDirectory;
+                $this->directories[$fullPath] = $ormDirectory;
             }
         }
     }
@@ -82,19 +84,22 @@ class ReaderMediaCommand extends Command
             $output->writeln($file);
             /* @var SplFileInfo $file */
             $ormFile = new File();
-            $ormFile->setPath((string)$file);
+            $fullPath = str_replace('media/','',(string)$file);
+            $path = str_replace('media/','',(string)$file->getPath());
+            $ormFile->setPath($fullPath);
             $ormFile->setFilename($file->getFilename());
-            $ormFile->setMimetype($file->getExtension());
+            $mime = new MimeReader($file->getRealPath());
+            $ormFile->setMimetype($mime->getType());
             $ormFile->setSize($file->getSize());
-            if(array_key_exists($file->getPath(), $this->directories)){
+            if(array_key_exists($path, $this->directories)){
                 /* @var Folder $folder */
-                $folder = $this->directories[$file->getPath()];
+                $folder = $this->directories[$path];
                 $ormFile->setFolder($folder);
             }
-            if(!array_key_exists((string)$file, $this->files)) {
+            if(!array_key_exists($fullPath, $this->files)) {
                 $this->em->persist($ormFile);
                 $this->counter['file']++;
-                $this->medias[(string)$file] = $ormFile;
+                $this->files[$fullPath] = $ormFile;
             }
         }
     }

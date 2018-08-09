@@ -65,7 +65,7 @@ class File {
      * file mime type
      * @var string
      * 
-     * @ORM\Column(name="mimetype", type="string", length=20, nullable=true)
+     * @ORM\Column(name="mimetype", type="string", length=50, nullable=true)
      */
     private $mimetype;
 
