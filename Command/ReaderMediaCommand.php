@@ -61,13 +61,15 @@ class ReaderMediaCommand extends Command
             /* @var SplFileInfo $directory */
             $ormDirectory = new Folder();
             $fullPath = str_replace('media/','',(string)$directory);
+            $path = str_replace('media/','',(string)$directory->getPath());
+
             $ormDirectory->setName($directory->getFilename());
             $ormDirectory->setPath($fullPath);
 
             //In class SplFileInfo the path return the parent directory
-            if(array_key_exists($directory->getPath(), $this->directories)){
+            if(array_key_exists($path, $this->directories)){
                 /* @var Folder $folder */
-                $folder = $this->directories[$fullPath];
+                $folder = $this->directories[$path];
                 $ormDirectory->setParent($folder);
             }
             if(!array_key_exists($fullPath, $this->directories)) {
