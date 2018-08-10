@@ -231,11 +231,15 @@ class Folder {
             foreach ($this->files as $file) {
                 /* @var File $file */
                 if ($file->getFileName() === $filename) {
-                    return '/media/' . $file->getPath();
+                    return $file->getPublicPath();
                 }
             }
         }
         return null;
+    }
+
+    public function getLvl(){
+        return $this->lvl;
     }
 
 

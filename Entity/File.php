@@ -198,6 +198,6 @@ class File {
     }
 
     public function getPublicPath(){
-        return 'media/'.$this->getPath();
+        return '/media/'.$this->getPath();
     }
 }
