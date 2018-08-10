@@ -158,6 +158,16 @@ class Folder {
         return $this->files;
     }
 
+    public function hasFile($filename){
+        foreach($this->files as $file){
+            /* @var File $file */
+            if($file->getFileName() === $filename){
+                return true;
+            }
+        }
+        return false;
+    }
+
     public function setFiles($files) {
         $this->files = $files;
     }
@@ -210,7 +220,22 @@ class Folder {
     }
 
     public function getPublicPath(){
-        return 'media/'.$this->getPath();
+        if($this->getPublic()) {
+            return '/media/' . $this->getPath();
+        }
+        return null;
+    }
+
+    public function getPublicPathFile($filename){
+        if($this->getPublic()) {
+            foreach ($this->files as $file) {
+                /* @var File $file */
+                if ($file->getFileName() === $filename) {
+                    return '/media/' . $file->getPath();
+                }
+            }
+        }
+        return null;
     }
 
 
