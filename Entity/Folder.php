@@ -19,9 +19,8 @@ use Gedmo\Sluggable\Util\Urlizer;
  */
 class Folder {
 
-
     public function __toString() {
-        return $this->getName() ? : '-';
+        return $this->getPath() ? : '-';
     }
 
     /**
@@ -70,6 +69,7 @@ class Folder {
 
     /**
      * @ORM\OneToMany(targetEntity="Folder", mappedBy="parent")
+     * @ORM\OrderBy({"path" = "ASC"})* 
      */
     private $children;
 
@@ -227,14 +227,14 @@ class Folder {
     }
 
     public function getPublicPathFile($filename){
-        if($this->getPublic()) {
+        //if($this->getPublic()) {
             foreach ($this->files as $file) {
                 /* @var File $file */
                 if ($file->getFileName() === $filename) {
                     return $file->getPublicPath();
                 }
             }
-        }
+        //}
         return null;
     }
 
