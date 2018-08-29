@@ -35,13 +35,15 @@
 
                     {% for f in folder.getFiles() %}
                         <tr>
-                            <td><a target="_blank" href="{{ path('lle_media_download_file',{id:f.id}) }}"><i class="fa fa-2x fa-file-o"></i> {{ f.filename }} </a></td>
-                            <td></td>
+                            <td><a target="_blank" href="{{ path('lle_media_download_file',{id:f.id}) }}"><i class="fa fa-2x fa-file-o"></i> {{ f.filename }} </a>
+                            </td>
+                            <td>
+                                    <small>{{ app.request.getSchemeAndHttpHost() }}{{ f.publicPath }}</small>                                                        
+                            </td>
                             <td></td>
                             <td>
                                 <nav class="nav nav-list">
                                     <a class="btn btn-info"  target="_blank" href="{{ path('lle_media_download_file',{id:f.id}) }}"><i class="fa fa-download"></i></a>
-
                                     <form style="display: inline" method="post" action="{{ path('lle_media_delete_file',{id:f.id}) }}">
 
                                         <button type="submit" class="btn btn-danger"><i class="fa fa-trash-o"></i></button>

@@ -24,8 +24,8 @@ class FolderController extends Controller
         $root = $em->getRepository('LleMediaBundle:Folder')->findOneBy(['parent'=>null]);
         if (!$root) {
             $root = new Folder();
-            $root->setName('Media');
-            $root->updatePath();
+            $root->setName('');
+            $root->setPath('');
             $em->persist($root);
             $em->flush();
         }

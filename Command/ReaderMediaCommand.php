@@ -18,6 +18,7 @@ class ReaderMediaCommand extends Command
     private $finder;
     private $em;
     private $directories;
+    private $root;
     private $files;
     private $counter;
 
@@ -43,6 +44,7 @@ class ReaderMediaCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->finder->in('media');
+        $this->root = $this->em->getRepository(Folder::class)->findOneByParent(null);
         $this->directories = $this->em->getRepository(Folder::class)->createQueryBuilder('f','f.path')->getQuery()->getResult();
         $this->files = $this->em->getRepository(File::class)->createQueryBuilder('f','f.path')->getQuery()->getResult();
         $this->readDirectories($output);
@@ -71,6 +73,8 @@ class ReaderMediaCommand extends Command
                 /* @var Folder $folder */
                 $folder = $this->directories[$path];
                 $ormDirectory->setParent($folder);
+            } else {
+                $ormDirectory->setParent($this->root);
             }
             if(!array_key_exists($fullPath, $this->directories)) {
                 $this->em->persist($ormDirectory);
