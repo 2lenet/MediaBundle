@@ -69,7 +69,7 @@ class Folder {
 
     /**
      * @ORM\OneToMany(targetEntity="Folder", mappedBy="parent")
-     * @ORM\OrderBy({"path" = "ASC"})* 
+     * @ORM\OrderBy({"name" = "ASC"})* 
      */
     private $children;
 
