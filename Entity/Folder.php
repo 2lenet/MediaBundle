@@ -194,12 +194,14 @@ class Folder {
     }
 
     public function updatePath() {
-        $path = "/";
+        $path = "";
         $urlizer = new Urlizer();
         foreach($this->getParents() as $parent) {
-            $path .= $urlizer->urlize($parent->getName()).'/';
+            if ($parent->getName()) {
+                $path .= $urlizer->urlize($parent->getName()).'/';
+            }
         }
-        $path .= $urlizer->urlize($this->getName()).'/';
+        $path .= $urlizer->urlize($this->getName());
         $this->path = $path;
     }
 
