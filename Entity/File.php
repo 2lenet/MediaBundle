@@ -172,7 +172,7 @@ class File {
                 $upload_dir, $storename
             );
 
-            $this->setPath($this->folder->getPath().$storename);
+            $this->setPath($this->folder->getPath().'/'.$storename);
         }
     }
 
