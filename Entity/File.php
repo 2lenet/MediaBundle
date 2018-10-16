@@ -35,7 +35,7 @@ class File {
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Folder", inversedBy="files", cascade={"persist", "remove"})
+     * @ORM\ManyToOne(targetEntity="Folder", inversedBy="files", cascade={"persist"})
      * @ORM\JoinColumn(name="folder_id", referencedColumnName="id", onDelete="CASCADE")
      */
     private $folder;
