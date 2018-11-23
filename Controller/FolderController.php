@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\File\MimeType\FileinfoMimeTypeGuesser;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class FolderController extends Controller
 {
@@ -64,7 +65,7 @@ class FolderController extends Controller
         $parent_id= $folder->getParent()->getId();
         $em->remove($folder);
         $em->flush();
-        return $this->redirect($this->generateUrl('lle_media_folder',array('id'=>$parent_id)));
+        return $this->redirectToRoute('lle_media_folder', ['id' => $parent_id]);
     }
 
     public function deleteFileAction($id)
@@ -83,8 +84,7 @@ class FolderController extends Controller
             $em->remove($file);
             $em->flush();
         }
-        return $this->redirect($this->generateUrl('lle_media_index',array('id'=>$parent_id)));
-
+        return $this->redirectToRoute('lle_media_folder', ['id'=>$parent_id]);
     }
 
     public function fileUploadAction(Request $request, Folder $folder){
