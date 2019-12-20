@@ -7,6 +7,7 @@ use Lle\MediaBundle\Entity\Folder;
 use Lle\MediaBundle\Form\FileType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Config\Definition\Exception\Exception;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,6 +17,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\File\MimeType\FileinfoMimeTypeGuesser;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 class FolderController extends Controller
 {
@@ -59,6 +61,23 @@ class FolderController extends Controller
         return $this->redirectToRoute('lle_media_folder', ['id' => $folder->getId()] );
     }
 
+    public function editFolderAction(Request $request, Folder $folder)
+    {
+        $form = $this->createFormBuilder($folder)
+            ->add('name', TextType::class, ['required' => true, 'constraints' => [new NotNull()]])
+            ->getForm();
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->getDoctrine()->getManager()->persist($folder);
+            $this->getDoctrine()->getManager()->flush();
+            if ($folder->getParent()) {
+                return $this->redirectToRoute('lle_media_folder', ['id' => $folder->getParent()->getId()]);
+            }
+            return $this->redirectToRoute('lle_media_index');
+        }
+        return $this->render('LleMediaBundle:Folder:edit.html.twig', ['form' => $form->createView(), 'folder' => $folder]);
+    }
+
     public function deleteFolderAction(Folder $folder)
     {
         $em = $this->getDoctrine()->getManager();
@@ -92,7 +111,7 @@ class FolderController extends Controller
         $root = $this->getParameter('kernel.root_dir')."/../media/";
 
         $media = $request->files->get('file');
-       
+
         $file = new File();
         $file->setFolder($folder);
         $file->upload($media, $root);

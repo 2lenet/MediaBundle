@@ -9,7 +9,7 @@
             <div class="box-header">
                 <h3 class="box-title">
                     {% for parent in folder.parents %}
-                        <a href="{{ path('lle_media_folder',{id:parent.id}) }}"> {{ parent.name }}</a> / 
+                        <a href="{{ path('lle_media_folder',{id:parent.id}) }}"> {{ parent.name }}</a> /
                     {% endfor %}
                     {{ folder.name }}
                 </h3>
@@ -24,6 +24,7 @@
                         <td></td>
                         <td>
                             <nav class="nav nav-list">
+                                <a href="{{ path('lle_media_edit_folder',{id:f.id}) }}" class="btn btn-warning"><i class="fa fa-pencil-square-o"></i></a>
                                 <form style="display: inline" method="post" action="{{ path('lle_media_delete_folder',{id:f.id}) }}">
                                     <button type="submit" class="btn btn-danger"><i class="fa fa-trash-o"></i></button>
                                 </form>
@@ -37,7 +38,7 @@
                             <td><a target="_blank" href="{{ path('lle_media_download_file',{id:f.id}) }}"><i class="fa fa-2x fa-file-o"></i> {{ f.filename }} </a>
                             </td>
                             <td>
-                                    <small>{{ app.request.getSchemeAndHttpHost() }}{{ f.publicPath }}</small>                                                        
+                                    <small>{{ app.request.getSchemeAndHttpHost() }}{{ f.publicPath }}</small>
                             </td>
                             <td></td>
                             <td>

@@ -1,0 +1,33 @@
+{% extends '@EasyAdmin/default/layout.html.twig' %}
+
+{% block heading %}Media{% endblock %}
+
+{% block content %}
+    <section class="content-header">
+        <h1 class="title">Modifier Dossier (#{{ folder.id }})</h1>
+    </section>
+    <section id="main" class="content">
+
+        {{ form_start(form, {'action': path('lle_media_edit_folder', {id: folder.id}), 'method': 'POST'}) }}
+            <div class="row">
+                <div class="col-xs-12 ">
+                    <div class="form-group  field-text"><div class="col-sm-2 control-label">{{ form_label(form.name, 'Nom') }}</div><div class="col-sm-10">{{ form_widget(form.name) }}</div></div>
+                </div>
+
+            </div>
+            <input type="hidden" id="userclient__token" name="userclient[_token]" value="IDZJOwGsk00OIQTTfG0FC4RLmXHv8CXcV8P1W-vCVuQ"><div class="row">
+                <div class="col-xs-12 form-actions" style="width: 1617px;">
+                    <div class="form-group">
+                        <div id="form-actions-row">
+                            <button type="submit" class="btn btn-primary action-save">
+                                <i class="fa fa-save"></i> Sauvegarder les modifications
+                            </button>
+                        </div>
+                    </div>
+                </div><div class="col-xs-12 form-actions sticky-wrapper" style="height: 0px;"></div>
+            </div>
+        {{ form_end(form) }}
+
+    </section>
+{% endblock %}
+
