@@ -4,6 +4,7 @@ namespace Lle\MediaBundle\Controller;
 
 use Lle\MediaBundle\Entity\File;
 use Lle\MediaBundle\Entity\Folder;
+use Lle\MediaBundle\Entity\Video;
 use Lle\MediaBundle\Form\FileType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Config\Definition\Exception\Exception;
@@ -106,6 +107,25 @@ class FolderController extends Controller
         return $this->redirectToRoute('lle_media_folder', ['id'=>$parent_id]);
     }
 
+    public function deleteVideoAction($id)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        if ($id) {
+            $video = $em->getRepository('LleMediaBundle:Video')->find($id);
+        }
+        $parent_id = 0;
+        if ($video) {
+            if ($video->getFolder()) {
+                $parent_id = $video->getFolder()->getId();
+            }
+            $em->remove($video);
+            $em->flush();
+        }
+
+        return $this->redirectToRoute('lle_media_folder', ['id' => $parent_id]);
+    }
+
     public function fileUploadAction(Request $request, Folder $folder){
         $em = $this->getDoctrine()->getManager();
         $root = $this->getParameter('kernel.root_dir')."/../media/";
@@ -119,6 +139,20 @@ class FolderController extends Controller
         $em->persist($file);
         $em->flush();
         return new JsonResponse(array('success' => true));
+    }
+
+    public function addVideoAction(Request $request, Folder $folder)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $video = new Video();
+        $video->setFolder($folder);
+        $video->setName($request->get('video_name'));
+        $video->setUrl($request->get('video_url'));
+        $em->persist($video);
+        $em->flush();
+
+        return $this->redirectToRoute('lle_media_folder', ['id' => $folder->getId()]);
     }
 
     public function downloadFileAction(File $file) {

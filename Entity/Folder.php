@@ -94,6 +94,12 @@ class Folder {
      */
     private $files;
 
+    /**
+     * @ORM\OneToMany(targetEntity="Video", orphanRemoval=true, mappedBy="folder", cascade={"remove"})
+     * @ORM\OrderBy({"name" = "ASC"})
+     */
+    private $videos;
+
     public function __construct(){
         $this->files = new ArrayCollection();
     }
@@ -181,6 +187,37 @@ class Folder {
         $this->files->removeElement($file);
     }
 
+    public function getVideos()
+    {
+        return $this->videos;
+    }
+
+    public function hasVideo($name)
+    {
+        foreach ($this->videos as $video) {
+            /* @var Video $video */
+            if ($video->getName() === $name) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function setVideos($videos)
+    {
+        $this->videos = $videos;
+    }
+
+    public function addVideo(Video $video)
+    {
+        $video->setFolder($this);
+        $this->videos->add($video);
+    }
+
+    public function removeVideo(Video $video)
+    {
+        $this->videos->removeElement($video);
+    }
 
     public function getPath() {
         if (!$this->path) {
