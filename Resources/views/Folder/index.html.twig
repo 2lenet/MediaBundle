@@ -38,37 +38,58 @@
                             <td><a target="_blank" href="{{ path('lle_media_download_file',{id:f.id}) }}"><i class="fa fa-2x fa-file-o"></i> {{ f.filename }} </a>
                             </td>
                             <td>
-                                    <small>{{ app.request.getSchemeAndHttpHost() }}{{ f.publicPath }}</small>
+                                <small>{{ app.request.getSchemeAndHttpHost() }}{{ f.publicPath }}</small>
                             </td>
                             <td></td>
                             <td>
                                 <nav class="nav nav-list">
                                     <a class="btn btn-info"  target="_blank" href="{{ path('lle_media_download_file',{id:f.id}) }}"><i class="fa fa-download"></i></a>
                                     <form style="display: inline" method="post" action="{{ path('lle_media_delete_file',{id:f.id}) }}">
-
                                         <button type="submit" class="btn btn-danger"><i class="fa fa-trash-o"></i></button>
                                     </form>
                                 </nav>
+                            </td>
+                        </tr>
+                    {% endfor %}
 
+                    {% for video in folder.getVideos() %}
+                        <tr>
+                            <td>
+                                <a href="{{ video.url }}" target="_blank"><i class="fa fa-2x fa-file-o"></i> {{ video.name }}</a>
+                            </td>
+                            <td>
+                                <small>{{ video.url }}</small>
+                            </td>
+                            <td></td>
+                            <td>
+                                <nav class="nav nav-list">
+                                    <form method="post" action="{{ path('lle_media_delete_video', {id: video.id}) }}">
+                                        <button type="submit" class="btn btn-danger"><i class="fa fa-trash-o"></i></button>
+                                    </form>
+                                </nav>
                             </td>
                         </tr>
                     {% endfor %}
                     </tbody>
                 </table>
             </div>
+
             <div class="box-footer">
                 <form style="display: inline" method="post" action="{{ path('lle_media_new_folder',{id:folder.id}) }}">
                     <input type="text" name="folder_name" placeholder="create new folder here">
                     <button type="submit" class="btn btn-sm"><i class="fa fa-check-o"></i>Ok</button>
                 </form>
 
-                <div class="dropzone upload-dropzone" id="file_upload" action="{{path('lle_media_file_upload',{id:folder.id})}}">
-                </div>
+                <div class="dropzone upload-dropzone" id="file_upload" action="{{path('lle_media_file_upload',{id:folder.id})}}"></div>
+
+                <form method="post" action="{{ path('lle_media_new_video', {id:folder.id}) }}">
+                    <input type="text" name="video_name" placeholder="Video name">
+                    <input type="url" name="video_url" placeholder="Video URL">
+                    <button type="submit" class="btn btn-sm"><i class="fa fa-check-o"></i>Ok</button>
+                </form>
             </div>
         </div>
     </div>
-
-
 {% endblock %}
 
 {% block head_javascript %}
