@@ -25,7 +25,7 @@ class Video {
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Folder", inversedBy="files", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="Folder", inversedBy="videos", cascade={"persist"})
      * @ORM\JoinColumn(name="folder_id", referencedColumnName="id", onDelete="CASCADE")
      */
     private $folder;
